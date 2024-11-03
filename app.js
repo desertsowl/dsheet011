@@ -35,12 +35,20 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
+// ユーザー認証用のミドルウェア
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+        return next();
+    }
+    res.redirect('/');
+}
+
 // Routes
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { user: req.session.user });
 });
 
-app.get('/checklist', (req, res) => {
+app.get('/checklist', isAuthenticated, (req, res) => {
     const results = [];
     fs.createReadStream('equipment.csv')
         .pipe(csv())
@@ -55,15 +63,12 @@ app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const users = readUsers();
 
-    // ユーザーが既に存在するかチェック
     if (users.find(user => user.username === username)) {
         return res.status(400).send('ユーザーは既に存在します');
     }
 
-    // パスワードをハッシュ化
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 新しいユーザーを追加
     users.push({ username, password: hashedPassword });
     writeUsers(users);
 
@@ -80,15 +85,13 @@ app.post('/login', async (req, res) => {
         return res.status(400).send('ユーザーが見つかりません');
     }
 
-    // パスワードを検証
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
         return res.status(400).send('パスワードが間違っています');
     }
 
-    // セッションにユーザー情報を保存
     req.session.user = { username: user.username };
-    res.send('ログインに成功しました');
+    res.redirect('/');
 });
 
 // ログアウト
@@ -97,7 +100,7 @@ app.post('/logout', (req, res) => {
         if (err) {
             return res.status(500).send('ログアウトに失敗しました');
         }
-        res.send('ログアウトしました');
+        res.redirect('/');
     });
 });
 

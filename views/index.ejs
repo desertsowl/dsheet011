@@ -6,8 +6,29 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Dsheet</h1>
-        <a href="/checklist" class="btn btn-primary">View Checklist</a>
+        <h1>ようこそDsheetへ</h1>
+
+        <% if (!user) { %>
+            <form action="/register" method="post">
+                <h2>ユーザー登録</h2>
+                <input type="text" name="username" placeholder="ユーザー名" required>
+                <input type="password" name="password" placeholder="パスワード" required>
+                <button type="submit" class="btn btn-primary">登録</button>
+            </form>
+
+            <form action="/login" method="post" style="margin-top: 20px;">
+                <h2>ログイン</h2>
+                <input type="text" name="username" placeholder="ユーザー名" required>
+                <input type="password" name="password" placeholder="パスワード" required>
+                <button type="submit" class="btn btn-success">ログイン</button>
+            </form>
+        <% } else { %>
+            <h2>こんにちは、<%= user.username %>さん</h2>
+            <form action="/logout" method="post" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-danger">ログアウト</button>
+            </form>
+            <a href="/checklist" class="btn btn-primary" style="margin-top: 20px;">チェックリストを見る</a>
+        <% } %>
     </div>
 </body>
 </html>
