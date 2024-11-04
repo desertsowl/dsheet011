@@ -62,17 +62,17 @@ app.get('/checklist', isAuthenticated, (req, res) => {
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     const users = readUsers();
+    let error = null;
 
     if (users.find(user => user.username === username)) {
-        return res.render('index', { user: null, error: 'ユーザーは既に存在します' });
+        error = 'ユーザーは既に存在します';
+    } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        users.push({ username, password: hashedPassword });
+        writeUsers(users);
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    users.push({ username, password: hashedPassword });
-    writeUsers(users);
-
-    res.redirect('/');
+    res.render('index', { user: req.session.user || null, error });
 });
 
 // ログイン
@@ -80,17 +80,23 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const users = readUsers();
     const user = users.find(user => user.username === username);
+    let error = null;
 
     if (!user) {
-        return res.render('index', { user: null, error: 'ユーザーが見つかりません' });
+        error = 'ユーザーが見つかりません';
+    } else {
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            error = 'パスワードが間違っています';
+        } else {
+            req.session.user = { username: user.username };
+        }
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-        return res.render('index', { user: null, error: 'パスワードが間違っています' });
+    if (error) {
+        return res.render('index', { user: null, error });
     }
 
-    req.session.user = { username: user.username };
     res.redirect('/');
 });
 

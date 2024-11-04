@@ -1,0 +1,14 @@
+[
+  {
+    "username": "admin@dsheet",
+    "password": "$2b$10$WXYomZXqncKzVosTlKavFOgzmDbvS83vvMV8ynBG647k81GF9.LMK"
+  },
+  {
+    "username": "worker@dsheet",
+    "password": "$2b$10$xlinORgKaSL7D9K33zHTZOLvd6Jrx5IkuhTudoZ8WSWmGmKkWEKC."
+  },
+  {
+    "username": "taro@dsheet",
+    "password": "$2b$10$NidXezXm//CFYeWi7CFHYel1SskfAyp.AZK1cO7hUNg1mTzClhP4S"
+  }
+]
