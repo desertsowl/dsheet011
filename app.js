@@ -45,7 +45,7 @@ function isAuthenticated(req, res, next) {
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index', { user: req.session.user });
+    res.render('index', { user: req.session.user || null });
 });
 
 app.get('/checklist', isAuthenticated, (req, res) => {
@@ -72,7 +72,7 @@ app.post('/register', async (req, res) => {
     users.push({ username, password: hashedPassword });
     writeUsers(users);
 
-    res.send('登録が完了しました');
+    res.redirect('/');
 });
 
 // ログイン
