@@ -45,7 +45,7 @@ function isAuthenticated(req, res, next) {
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index', { user: req.session.user || null });
+    res.render('index', { user: req.session.user || null, error: null });
 });
 
 app.get('/checklist', isAuthenticated, (req, res) => {
@@ -64,7 +64,7 @@ app.post('/register', async (req, res) => {
     const users = readUsers();
 
     if (users.find(user => user.username === username)) {
-        return res.status(400).send('ユーザーは既に存在します');
+        return res.render('index', { user: null, error: 'ユーザーは既に存在します' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -82,12 +82,12 @@ app.post('/login', async (req, res) => {
     const user = users.find(user => user.username === username);
 
     if (!user) {
-        return res.status(400).send('ユーザーが見つかりません');
+        return res.render('index', { user: null, error: 'ユーザーが見つかりません' });
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-        return res.status(400).send('パスワードが間違っています');
+        return res.render('index', { user: null, error: 'パスワードが間違っています' });
     }
 
     req.session.user = { username: user.username };

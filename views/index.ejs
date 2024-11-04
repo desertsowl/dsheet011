@@ -8,6 +8,10 @@
     <div class="container">
         <h1>ようこそDsheetへ</h1>
 
+        <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
         <% if (!user) { %>
             <form action="/register" method="post">
                 <h2>ユーザー登録</h2>
